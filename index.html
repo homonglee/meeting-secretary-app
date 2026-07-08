@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>원클릭 회의록 정리 비서</title>
+  <meta name="description" content="낙서 같은 미팅 메모를 핵심 요약, 결정 사항, Todo List로 정리하는 원페이지 인터랙티브 앱" />
+  <style>
+    :root{
+      --bg:#0b1020; --panel:#111832; --panel2:#151f3d; --ink:#eef4ff; --muted:#95a3c7;
+      --line:rgba(255,255,255,.12); --accent:#74f0c1; --accent2:#8aa4ff; --warn:#ffd166;
+      --danger:#ff7a90; --card:rgba(255,255,255,.07); --shadow: 0 24px 80px rgba(0,0,0,.35);
+      --radius:24px;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans KR",Arial,sans-serif;background:radial-gradient(circle at 12% 10%,rgba(116,240,193,.18),transparent 28%),radial-gradient(circle at 88% 5%,rgba(138,164,255,.20),transparent 30%),linear-gradient(135deg,#090d19,#111832 55%,#080b15);color:var(--ink);min-height:100vh;line-height:1.55} 
+    button,input,textarea,select{font:inherit} button{cursor:pointer} .wrap{max-width:1240px;margin:0 auto;padding:28px 22px 56px}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:28px}.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.03em}.logo{width:42px;height:42px;border-radius:15px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#061120;box-shadow:0 10px 35px rgba(116,240,193,.25)}.pill{border:1px solid var(--line);background:rgba(255,255,255,.06);border-radius:99px;color:var(--muted);padding:9px 13px;font-size:13px;display:flex;gap:8px;align-items:center}.dot{width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 18px var(--accent)}
+    .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:24px;align-items:stretch}.hero-card,.app-card,.result-card,.feature{background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.045));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(18px)}.hero-card{padding:34px;position:relative;overflow:hidden}.hero-card:after{content:"";position:absolute;right:-80px;bottom:-80px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(116,240,193,.22),transparent 70%)}
+    h1{margin:0;font-size:clamp(42px,6vw,78px);line-height:.98;letter-spacing:-.075em}.grad{background:linear-gradient(90deg,#fff,var(--accent) 45%,#bac7ff);-webkit-background-clip:text;color:transparent}.lead{font-size:19px;color:#c8d2ed;margin:22px 0 26px;max-width:680px}.hero-actions{display:flex;gap:12px;flex-wrap:wrap}.btn{border:0;border-radius:16px;padding:14px 18px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:.2s transform,.2s opacity,.2s background}.btn:hover{transform:translateY(-2px)}.primary{background:linear-gradient(135deg,var(--accent),#9fffdc);color:#071325;box-shadow:0 14px 40px rgba(116,240,193,.25)}.secondary{background:rgba(255,255,255,.09);color:var(--ink);border:1px solid var(--line)}.danger{background:rgba(255,122,144,.14);color:#ffdce3;border:1px solid rgba(255,122,144,.28)}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:28px}.stat{background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:18px;padding:16px}.stat b{display:block;font-size:24px}.stat span{color:var(--muted);font-size:13px}.demo-note{padding:24px}.note-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{font-size:12px;padding:7px 10px;border-radius:99px;background:rgba(116,240,193,.12);color:#baffea;border:1px solid rgba(116,240,193,.18)}.scribble{font-family:"SF Mono",Menlo,Consolas,monospace;background:rgba(2,5,14,.46);border:1px dashed rgba(255,255,255,.2);border-radius:18px;padding:18px;color:#dce6ff;min-height:270px;white-space:pre-wrap;transform:rotate(-.35deg);box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)}
+    .section-title{display:flex;align-items:end;justify-content:space-between;gap:18px;margin:34px 0 16px}.section-title h2{margin:0;font-size:30px;letter-spacing:-.045em}.section-title p{margin:0;color:var(--muted)}.app{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,.9fr);gap:20px}.app-card{padding:20px}.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}.tabs{display:flex;background:rgba(0,0,0,.2);padding:4px;border-radius:14px;border:1px solid var(--line)}.tab{border:0;background:transparent;color:var(--muted);padding:9px 11px;border-radius:11px;font-size:13px;font-weight:800}.tab.active{background:rgba(255,255,255,.12);color:var(--ink)}
+    textarea{width:100%;min-height:390px;resize:vertical;background:rgba(0,0,0,.27);border:1px solid var(--line);border-radius:20px;color:var(--ink);padding:18px;outline:none}.input-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px;flex-wrap:wrap}.metrics{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px}.metric{padding:8px 10px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px}.result-card{padding:20px;min-height:100%;position:relative;overflow:hidden}.status{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.badge{font-size:12px;font-weight:900;letter-spacing:.03em;text-transform:uppercase;padding:7px 10px;border-radius:99px;background:rgba(138,164,255,.16);color:#dce3ff;border:1px solid rgba(138,164,255,.24)}.progress{height:8px;background:rgba(255,255,255,.08);border-radius:99px;overflow:hidden;margin:12px 0 18px}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .55s ease}.result-grid{display:grid;gap:14px}.output{background:rgba(0,0,0,.2);border:1px solid var(--line);border-radius:18px;padding:16px}.output h3{margin:0 0 10px;font-size:18px;letter-spacing:-.03em;display:flex;gap:8px;align-items:center}.output ul{margin:0;padding-left:21px;color:#dbe5ff}.output li{margin:7px 0}.todo-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;margin:9px 0;color:#dbe5ff}.check{width:20px;height:20px;border-radius:7px;border:1px solid rgba(116,240,193,.55);display:grid;place-items:center;color:var(--accent);font-size:12px}.owner{font-size:12px;color:#10172a;background:var(--warn);padding:4px 7px;border-radius:99px;font-weight:900;white-space:nowrap}.empty{color:var(--muted);padding:30px 16px;text-align:center;border:1px dashed var(--line);border-radius:18px;background:rgba(255,255,255,.035)}
+    .features{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.feature{padding:18px}.feature strong{display:block;margin-bottom:6px}.feature p{margin:0;color:var(--muted);font-size:14px}.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(30px);opacity:0;transition:.25s;background:#eef4ff;color:#071325;border-radius:14px;padding:12px 16px;font-weight:900;box-shadow:0 20px 60px rgba(0,0,0,.35);z-index:20}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.kbd{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#c8d2ed;background:rgba(255,255,255,.08);border:1px solid var(--line);padding:3px 7px;border-radius:8px}.confetti{position:absolute;inset:0;pointer-events:none;overflow:hidden}.piece{position:absolute;width:8px;height:14px;background:var(--accent);border-radius:3px;animation:fall 1.4s ease-out forwards}@keyframes fall{from{transform:translateY(-20px) rotate(0);opacity:1}to{transform:translateY(330px) rotate(420deg);opacity:0}}@media(max-width:940px){.hero,.app{grid-template-columns:1fr}.features{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:1fr}}@media(max-width:560px){.wrap{padding:18px 14px 40px}.hero-card{padding:24px}.features{grid-template-columns:1fr}.toolbar,.top{align-items:flex-start;flex-direction:column}.hero-actions .btn{width:100%}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><div class="logo">✦</div><div>원클릭 회의록 정리 비서</div></div>
+      <div class="pill"><span class="dot"></span> 낙서 메모 → 실행 가능한 회의록</div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-card">
+        <h1>대충 적은 메모도<br><span class="grad">회의록처럼</span> 정리합니다.</h1>
+        <p class="lead">흩어진 발언, 줄임말, 액션 아이템을 자동으로 분류해 핵심 요약·결정 사항·Todo List로 변환하는 원페이지 인터랙티브 프로토타입입니다.</p>
+        <div class="hero-actions">
+          <button class="btn primary" onclick="document.getElementById('memo').focus();document.getElementById('workspace').scrollIntoView({behavior:'smooth'})">메모 붙여넣기 ↓</button>
+          <button class="btn secondary" id="loadSample">샘플 메모 불러오기</button>
+        </div>
+        <div class="stats">
+          <div class="stat"><b id="statSummary">3</b><span>줄 요약 기본 생성</span></div>
+          <div class="stat"><b id="statDecision">0</b><span>결정 사항 감지</span></div>
+          <div class="stat"><b id="statTodo">0</b><span>Todo 후보 추출</span></div>
+        </div>
+      </div>
+      <div class="hero-card demo-note">
+        <div class="note-head"><strong>입력 예시</strong><div class="chips"><span class="chip">낙서형</span><span class="chip">두서없음</span><span class="chip">빠른 정리</span></div></div>
+        <div class="scribble">마케팅 랜딩 8/5 오픈 가능?
+민지: 카피 금요일까지 1차. 성훈은 가격표 다시 확인.
+결정: 무료 체험 14일로 간다.
+리스크 - 결제 문구 법무 체크 필요.
+다음 회의 화 10시. 앱 푸시 문구는 보류.</div>
+      </div>
+    </section>
+
+    <div class="section-title" id="workspace">
+      <div><h2>회의록 정리 워크스페이스</h2><p>붙여넣고 한 번 누르면 카드형 결과로 재구성됩니다.</p></div>
+      <span class="kbd">⌘/Ctrl + Enter 정리</span>
+    </div>
+
+    <main class="app">
+      <section class="app-card">
+        <div class="toolbar">
+          <strong>1. 원본 메모</strong>
+          <div class="tabs" aria-label="입력 모드">
+            <button class="tab active" data-mode="messy">낙서</button>
+            <button class="tab" data-mode="formal">회의록</button>
+            <button class="tab" data-mode="chat">채팅 로그</button>
+          </div>
+        </div>
+        <textarea id="memo" placeholder="여기에 대충 받아 적은 미팅 메모를 붙여넣으세요.\n예: 결정:, 해야함, @담당자, 다음까지, 보류, 리스크 같은 표현을 자동으로 감지합니다."></textarea>
+        <div class="input-footer">
+          <div class="metrics"><span class="metric"><b id="chars">0</b>자</span><span class="metric"><b id="lines">0</b>줄</span><span class="metric"><b id="signal">신호 0개</b></span></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn secondary" id="clearBtn">초기화</button><button class="btn primary" id="organizeBtn">원클릭 정리</button></div>
+        </div>
+      </section>
+
+      <aside class="result-card">
+        <div class="confetti" id="confetti"></div>
+        <div class="status"><strong>2. 정리 결과</strong><span class="badge" id="statusBadge">대기 중</span></div>
+        <div class="progress"><div class="bar" id="bar"></div></div>
+        <div class="result-grid" id="results"><div class="empty">아직 정리된 회의록이 없습니다.<br>샘플을 불러오거나 메모를 입력해 보세요.</div></div>
+      </aside>
+    </main>
+
+    <section class="section-title"><div><h2>핵심 인터랙션</h2><p>실제 서비스로 확장 가능한 1페이지 흐름</p></div></section>
+    <section class="features">
+      <div class="feature"><strong>① 신호 감지</strong><p>결정, 보류, 리스크, 담당자, 날짜 표현을 실시간으로 세어 정리 가능성을 보여줍니다.</p></div>
+      <div class="feature"><strong>② 원클릭 구조화</strong><p>요약·결정·Todo·리스크를 카드로 분리하고, 원본 문맥을 간결한 문장으로 바꿉니다.</p></div>
+      <div class="feature"><strong>③ 담당자 태깅</strong><p>@이름 또는 “이름:” 패턴을 Todo 담당자 칩으로 추출합니다.</p></div>
+      <div class="feature"><strong>④ 복사/공유</strong><p>결과를 마크다운 형식으로 복사해 Slack, Notion, Docs에 바로 붙여넣을 수 있습니다.</p></div>
+    </section>
+  </div>
+  <div class="toast" id="toast">복사되었습니다</div>
+<script>
+const sample = `마케팅 랜딩페이지 회의 7/8\n민지: 히어로 카피 금요일까지 1차 작성. 버튼 문구는 "무료로 시작"으로 가자.\n성훈은 가격표 플랜명 다시 확인해서 내일까지 공유.\n결정: 무료 체험 기간 14일, 카드 등록은 온보딩 마지막 단계에서 받기.\n디자인 시안은 대체로 B안. 다만 모바일 CTA가 너무 아래에 있음.\n리스크: 결제 문구 법무 검토 필요. 개인정보 문구도 체크.\n보류: 앱 푸시 문구, 추천인 캠페인은 다음 스프린트로.\n다음 회의 화요일 10시. 배포 목표 8/5.`;
+const memo = document.getElementById('memo'), results = document.getElementById('results'), bar = document.getElementById('bar'), badge = document.getElementById('statusBadge');
+const chars = document.getElementById('chars'), lines = document.getElementById('lines'), signal = document.getElementById('signal');
+const statDecision = document.getElementById('statDecision'), statTodo = document.getElementById('statTodo');
+function sentences(text){return text.split(/[\n.!?。]+/).map(s=>s.trim()).filter(Boolean)}
+function ownerOf(s){let m=s.match(/@([가-힣A-Za-z0-9_]+)/)||s.match(/^([가-힣A-Za-z]{2,4})\s*[:：]/);return m?m[1]:'담당 미정'}
+function clean(s){return s.replace(/^[-*•\s]+/,'').replace(/^(결정|리스크|보류|TODO|할일)\s*[:：-]?\s*/i,'').trim()}
+function analyze(text){
+  const arr=sentences(text); const decision=/결정|확정|가자|하기로|채택|승인/; const todo=/까지|내일|금요일|월요일|화요일|수요일|목요일|담당|해야|작성|공유|확인|검토|수정|배포|준비|@/; const risk=/리스크|문제|우려|법무|체크|검토 필요|막힘|이슈/; const hold=/보류|나중|다음 스프린트|추후/;
+  const decisions=arr.filter(s=>decision.test(s)).map(clean).slice(0,5);
+  const risks=arr.filter(s=>risk.test(s)).map(clean).slice(0,4);
+  const todos=arr.filter(s=>todo.test(s)&&!decision.test(s)).map(s=>({text:clean(s),owner:ownerOf(s)})).slice(0,6);
+  const holds=arr.filter(s=>hold.test(s)).map(clean).slice(0,3);
+  let summary=[]; if(arr.length){summary.push(`이번 회의는 ${arr[0].replace(/[:：]$/,'')}를 중심으로 진행되었습니다.`)}
+  if(decisions[0]) summary.push(`핵심 결정은 “${decisions[0]}”입니다.`); else summary.push('명확한 결정 표현은 적지만 논의 항목을 실행 가능한 형태로 정리했습니다.');
+  if(todos.length) summary.push(`${todos.length}개의 후속 작업과 담당자/기한 후보를 추출했습니다.`); else summary.push('후속 작업은 추가 입력이 필요합니다.');
+  return {summary,decisions,risks,todos,holds,count:arr.length};
+}
+function updateMetrics(){const t=memo.value; const sig=(t.match(/결정|보류|리스크|까지|담당|@|검토|공유|확인|배포/g)||[]).length; chars.textContent=t.length; lines.textContent=t? t.split('\n').length:0; signal.textContent=`신호 ${sig}개`;}
+function card(title, icon, html){return `<div class="output"><h3>${icon} ${title}</h3>${html}</div>`}
+function organize(){
+  const text=memo.value.trim(); if(!text){showToast('먼저 메모를 입력하세요'); memo.focus(); return}
+  badge.textContent='분석 중'; bar.style.width='28%'; results.innerHTML='<div class="empty">메모에서 결정/담당자/리스크 신호를 찾는 중...</div>';
+  setTimeout(()=>{bar.style.width='72%';},260);
+  setTimeout(()=>{const a=analyze(text); statDecision.textContent=a.decisions.length; statTodo.textContent=a.todos.length; badge.textContent='정리 완료'; bar.style.width='100%';
+    const md = makeMarkdown(a);
+    results.innerHTML = card('핵심 요약','✨',`<ul>${a.summary.map(x=>`<li>${x}</li>`).join('')}</ul>`)+
+      card('결정 사항','✅', a.decisions.length?`<ul>${a.decisions.map(x=>`<li>${x}</li>`).join('')}</ul>`:'<p style="color:var(--muted);margin:0">결정으로 보이는 문장이 없습니다.</p>')+
+      card('Todo List','🧭', a.todos.length?a.todos.map(t=>`<div class="todo-row"><span class="check">✓</span><span>${t.text}</span><span class="owner">${t.owner}</span></div>`).join(''):'<p style="color:var(--muted);margin:0">Todo 후보가 없습니다.</p>')+
+      card('리스크 / 보류','⚠️',`<ul>${[...a.risks,...a.holds].slice(0,5).map(x=>`<li>${x}</li>`).join('')||'<li>특이 리스크 없음</li>'}</ul>`)+
+      `<button class="btn secondary" style="width:100%;margin-top:2px" id="copyBtn">마크다운으로 복사</button>`;
+    document.getElementById('copyBtn').onclick=()=>navigator.clipboard.writeText(md).then(()=>showToast('회의록 마크다운이 복사되었습니다'));
+    confetti();
+  },720)
+}
+function makeMarkdown(a){return `# 회의록 정리\n\n## 핵심 요약\n${a.summary.map(x=>`- ${x}`).join('\n')}\n\n## 결정 사항\n${(a.decisions.length?a.decisions:['결정 사항 없음']).map(x=>`- ${x}`).join('\n')}\n\n## Todo List\n${(a.todos.length?a.todos:[{text:'Todo 없음',owner:'-'}]).map(t=>`- [ ] ${t.text} (${t.owner})`).join('\n')}\n\n## 리스크/보류\n${([...a.risks,...a.holds].length?[...a.risks,...a.holds]:['특이사항 없음']).map(x=>`- ${x}`).join('\n')}`}
+function showToast(msg){const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800)}
+function confetti(){const c=document.getElementById('confetti'); c.innerHTML=''; for(let i=0;i<24;i++){const p=document.createElement('i'); p.className='piece'; p.style.left=Math.random()*100+'%'; p.style.background=['#74f0c1','#8aa4ff','#ffd166','#ff7a90'][i%4]; p.style.animationDelay=Math.random()*0.25+'s'; c.appendChild(p)} setTimeout(()=>c.innerHTML='',1700)}
+document.getElementById('loadSample').onclick=()=>{memo.value=sample; updateMetrics(); showToast('샘플 메모를 불러왔습니다'); document.getElementById('workspace').scrollIntoView({behavior:'smooth'})};
+document.getElementById('organizeBtn').onclick=organize; document.getElementById('clearBtn').onclick=()=>{memo.value='';updateMetrics();bar.style.width='0';badge.textContent='대기 중';results.innerHTML='<div class="empty">아직 정리된 회의록이 없습니다.<br>샘플을 불러오거나 메모를 입력해 보세요.</div>';statDecision.textContent='0';statTodo.textContent='0'};
+document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');showToast(btn.textContent+' 모드로 전환')});
+memo.addEventListener('input', updateMetrics); window.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){organize()}}); updateMetrics();
+</script>
+</body>
+</html>
